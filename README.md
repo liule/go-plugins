@@ -7,10 +7,6 @@ Go plugins is a place for community maintained plugins.
 Micro tooling is built on a powerful pluggable architecture. Plugins can be swapped out with zero code changes.
 This repository contains plugins for all micro related tools. Read on for further info.
 
-Read the [docs](https://micro.mu/docs/plugins.html) to learn more about how to use them.
-
-Follow us on [Twitter](https://twitter.com/microhq) or join the [Slack](http://slack.micro.mu/) community.
-
 ## Getting Started
 
 * [Contents](#contents)
