@@ -1,4 +1,4 @@
-module github.com/micro/go-plugins/registry/kubernetes/v2
+module github.com/liule/go-plugins/registry/kubernetes/v2
 
 go 1.13
 
