@@ -136,7 +136,7 @@ func (k *k8sWatcher) handleEvent(event watch.Event) {
 		return
 	}
 
-	fmt.Printf("event.Type is [%v]\n", event.Type)
+	fmt.Printf("k8sWatcher handleEvent: [%v]  [%s]\n", event.Type, pod.Metadata.Name)
 	switch event.Type {
 	case watch.Modified:
 		// Pod was modified
