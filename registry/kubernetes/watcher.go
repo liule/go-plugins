@@ -3,6 +3,7 @@ package kubernetes
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"strings"
 	"sync"
 
@@ -135,6 +136,7 @@ func (k *k8sWatcher) handleEvent(event watch.Event) {
 		return
 	}
 
+	fmt.Printf("event.Type is [%v]\n", event.Type)
 	switch event.Type {
 	case watch.Modified:
 		// Pod was modified
