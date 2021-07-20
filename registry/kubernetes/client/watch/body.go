@@ -3,6 +3,7 @@ package watch
 import (
 	"bufio"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
 )
@@ -22,6 +23,7 @@ func (wr *bodyWatcher) ResultChan() <-chan Event {
 
 // Stop cancels the request
 func (wr *bodyWatcher) Stop() {
+	fmt.Printf("bodyWatcher.stop\n")
 	select {
 	case <-wr.stop:
 		return
@@ -48,6 +50,7 @@ func (wr *bodyWatcher) stream() {
 			// read a line
 			b, err := reader.ReadBytes('\n')
 			if err != nil {
+				fmt.Printf("reader.ReadBytes : [%s]\n", err.Error())
 				return
 			}
 
