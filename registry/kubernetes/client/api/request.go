@@ -2,11 +2,13 @@ package api
 
 import (
 	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
+	"time"
 
 	"github.com/micro/go-plugins/registry/kubernetes/v2/client/watch"
 )
@@ -185,6 +187,17 @@ func (r *Request) Watch() (watch.Watch, error) {
 		return nil, err
 	}
 
+	// the same with another client
+	tr := &http.Transport{
+		TLSClientConfig:     &tls.Config{},
+		DisableCompression:  true,
+		MaxIdleConnsPerHost: 1024,
+		TLSHandshakeTimeout: 0 * time.Second,
+	}
+
+	r.client = &http.Client{
+		Transport: tr,
+	}
 	w, err := watch.NewBodyWatcher(req, r.client)
 	return w, err
 }
