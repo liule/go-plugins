@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 	"sync"
+	"time"
 
 	log "github.com/micro/go-micro/v2/logger"
 	"github.com/micro/go-micro/v2/registry"
@@ -17,6 +18,7 @@ type k8sWatcher struct {
 	registry *kregistry
 	watcher  watch.Watch
 	next     chan *registry.Result
+	ttl      time.Duration
 
 	sync.RWMutex
 	pods map[string]*client.Pod
@@ -187,12 +189,24 @@ func (k *k8sWatcher) handleEvent(event watch.Event) {
 }
 
 // Next will block until a new result comes in
+// func (k *k8sWatcher) Next() (*registry.Result, error) {
+// 	r, ok := <-k.next
+// 	if !ok {
+// 		return nil, errors.New("result chan closed")
+// 	}
+// 	return r, nil
+// }
+
 func (k *k8sWatcher) Next() (*registry.Result, error) {
-	r, ok := <-k.next
-	if !ok {
-		return nil, errors.New("result chan closed")
+	select {
+	case r, ok := <-k.next:
+		if !ok {
+			return nil, errors.New("result chan closed")
+		}
+		return r, nil
+	case <-time.After(k.ttl):
+		return nil, errors.New("watcher next timeout")
 	}
-	return r, nil
 }
 
 // Stop will cancel any requests, and close channels
@@ -231,6 +245,7 @@ func newWatcher(kr *kregistry, opts ...registry.WatchOption) (registry.Watcher, 
 		watcher:  watcher,
 		next:     make(chan *registry.Result),
 		pods:     make(map[string]*client.Pod),
+		ttl:      time.Second * 20,
 	}
 
 	// update cache, but dont emit changes
@@ -244,7 +259,7 @@ func newWatcher(kr *kregistry, opts ...registry.WatchOption) (registry.Watcher, 
 		for event := range watcher.ResultChan() {
 			k.handleEvent(event)
 		}
-		k.Stop()
+		// k.Stop()
 	}()
 
 	return k, nil
